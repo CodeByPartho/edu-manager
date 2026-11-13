@@ -257,6 +257,19 @@ class EduState extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Removes every class, student, fee, notice and attendance record.
+  /// Nothing is reseeded, so the app starts clean.
+  Future<void> clearAll() async {
+    classes = [];
+    students = [];
+    fees = [];
+    notices = [];
+    attendance = {};
+    await _save();
+    notifyListeners();
+  }
+
+  /// Clears everything, then seeds the original demo classes and students.
   Future<void> resetDemoData() async {
     _seed();
     await _save();

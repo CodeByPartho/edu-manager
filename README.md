@@ -10,10 +10,11 @@ Education management mini app for schools and coaching centres. Built with Flutt
 - Attendance: mark present or absent per class for today, with present, absent and not marked counts, plus an All present button. Saved per date on the device
 - Fees: monthly fee list per student with paid and due status, mark paid and undo, collected and due totals for the current month
 - Notices: notice board to post and delete notices
+- Reset data: a refresh button in the top bar opens a confirmation dialog with two choices, Clear all data to start clean, or Restore demo data to bring back the original demo classes and students
 
 ## Data
 
-Everything is stored locally with shared_preferences as JSON. No account, no server, no network calls. The first launch seeds demo data: 2 classes (Class 8 Section A, Class 9 Section B) and 12 students, with about half of the current month fees already paid and one day of attendance history.
+Everything is stored locally with shared_preferences as JSON. No account, no server, no network calls. The first launch seeds demo data: 2 classes (Class 8 Section A, Class 9 Section B) and 12 students, with about half of the current month fees already paid and one day of attendance history. Use the reset option in the top bar to clear everything or restore the demo data at any time.
 
 ## Tech
 
@@ -37,7 +38,7 @@ flutter test
 flutter build web --release
 ```
 
-Unit tests cover fee totals (due, collected, due count, missing month fill) and attendance counting (present, absent, unmarked, percentage ignoring unmarked days).
+Unit tests cover fee totals (due, collected, due count, missing month fill), attendance counting (present, absent, unmarked, percentage ignoring unmarked days) and data reset (clear all, restore demo data, and persistence of both).
 
 ## Project structure
 

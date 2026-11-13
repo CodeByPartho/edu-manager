@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
+import '../state/edu_state.dart';
 import 'attendance_screen.dart';
 import 'classes_screen.dart';
 import 'dashboard_screen.dart';
@@ -29,7 +31,16 @@ class _MainShellState extends State<MainShell> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(_titles[_index])),
+      appBar: AppBar(
+        title: Text(_titles[_index]),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            tooltip: 'Reset data',
+            onPressed: () => _showResetDialog(context),
+          ),
+        ],
+      ),
       body: IndexedStack(
         index: _index,
         children: const [
@@ -61,6 +72,39 @@ class _MainShellState extends State<MainShell> {
         ],
       ),
     );
+  }
+
+  Future<void> _showResetDialog(BuildContext context) async {
+    final state = context.read<EduState>();
+    final choice = await showDialog<String>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('Reset data'),
+        content: const Text(
+          'Start clean or bring back the demo classes and students. '
+          'This cannot be undone.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop('clear'),
+            child: const Text('Clear all data'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(dialogContext).pop('demo'),
+            child: const Text('Restore demo data'),
+          ),
+        ],
+      ),
+    );
+    if (choice == 'clear') {
+      await state.clearAll();
+    } else if (choice == 'demo') {
+      await state.resetDemoData();
+    }
   }
 
   Widget? _fabFor(BuildContext context, int index) {
