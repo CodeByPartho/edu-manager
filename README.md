@@ -2,6 +2,19 @@
 
 Education management mini app for schools and coaching centres. Built with Flutter and Material 3. Part of a one app per day reference build series by Partho Sarothi Paik.
 
+Try it in your browser: https://codebypartho.github.io/edu-manager/
+
+## Download the APK
+
+Download the APK from the [v1.0.0 release](https://github.com/CodeByPartho/edu-manager/releases) on GitHub.
+
+## Screenshots
+
+![Dashboard](screenshots/dashboard.png)
+![Students](screenshots/students.png)
+![Attendance](screenshots/attendance.png)
+![Fees](screenshots/fees.png)
+
 ## What it does
 
 - Dashboard: total students, classes, fees due count and amount, present today, and the latest notice
