@@ -60,12 +60,38 @@ android {
             }
         }
     }
+
+    packaging {
+        resources {
+            // datastore 1.2.1 ships the same LICENSE.txt in both
+            // datastore-core-okio and datastore-core-okio-jvm; the
+            // classes do not clash, only this resource file does.
+            excludes += "META-INF/androidx/datastore/datastore-core-okio/LICENSE.txt"
+            // Multiplatform jars (collection, okio, ...) all embed the
+            // same Kotlin multiplatform metadata files under their
+            // shared source-set dirs. They are compiler metadata,
+            // unused at Android runtime.
+            excludes += "commonMain/**"
+            excludes += "linuxMain/**"
+            excludes += "nativeMain/**"
+            excludes += "META-INF/kotlin-project-structure-metadata.json"
+        }
+    }
 }
 
 kotlin {
     compilerOptions {
         jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17
     }
+}
+
+// v1.1.0 dependency fix: shared_preferences_android pulls in
+// datastore 1.2.1, whose -android AARs and -jvm JARs ship identical
+// classes, failing checkReleaseDuplicateClasses. The -android
+// artifacts are the ones used on Android.
+configurations.all {
+    exclude(group = "androidx.datastore", module = "datastore-core-jvm")
+    exclude(group = "androidx.datastore", module = "datastore-preferences-core-jvm")
 }
 
 flutter {
