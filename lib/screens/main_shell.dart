@@ -7,6 +7,7 @@ import 'classes_screen.dart';
 import 'dashboard_screen.dart';
 import 'fees_screen.dart';
 import 'notices_screen.dart';
+import 'results_screen.dart';
 import 'students_screen.dart';
 
 class MainShell extends StatefulWidget {
@@ -23,6 +24,7 @@ class _MainShellState extends State<MainShell> {
     'Dashboard',
     'Students',
     'Classes',
+    'Results',
     'Attendance',
     'Fees',
     'Notices',
@@ -47,6 +49,7 @@ class _MainShellState extends State<MainShell> {
           DashboardScreen(),
           StudentsScreen(),
           ClassesScreen(),
+          ResultsScreen(),
           AttendanceScreen(),
           FeesScreen(),
           NoticesScreen(),
@@ -60,6 +63,10 @@ class _MainShellState extends State<MainShell> {
           NavigationDestination(icon: Icon(Icons.dashboard), label: 'Home'),
           NavigationDestination(icon: Icon(Icons.people), label: 'Students'),
           NavigationDestination(icon: Icon(Icons.school), label: 'Classes'),
+          NavigationDestination(
+            icon: Icon(Icons.grade),
+            label: 'Results',
+          ),
           NavigationDestination(
             icon: Icon(Icons.fact_check),
             label: 'Attendance',
@@ -129,7 +136,17 @@ class _MainShellState extends State<MainShell> {
           tooltip: 'Add class',
           child: const Icon(Icons.add),
         );
-      case 5:
+      case 3:
+        return FloatingActionButton(
+          onPressed: () => showModalBottomSheet<void>(
+            context: context,
+            isScrollControlled: true,
+            builder: (_) => const AddResultSheet(),
+          ),
+          tooltip: 'Add marks',
+          child: const Icon(Icons.add),
+        );
+      case 6:
         return FloatingActionButton(
           onPressed: () => showModalBottomSheet<void>(
             context: context,

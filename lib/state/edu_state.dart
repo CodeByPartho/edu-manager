@@ -28,6 +28,8 @@ class EduState extends ChangeNotifier {
   List<Student> students = [];
   List<FeePayment> fees = [];
   List<Notice> notices = [];
+  List<ExamResult> results = [];
+  List<TimetableEntry> timetable = [];
 
   /// date key (yyyy-MM-dd) -> student id -> present?
   Map<String, Map<String, bool>> attendance = {};
@@ -51,6 +53,14 @@ class EduState extends ChangeNotifier {
             .toList();
         notices = (data['notices'] as List)
             .map((e) => Notice.fromJson(e as Map<String, dynamic>))
+            .toList();
+        // Results and timetable were added in v1.1.0, so older saved
+        // data may not have them yet.
+        results = ((data['results'] as List?) ?? [])
+            .map((e) => ExamResult.fromJson(e as Map<String, dynamic>))
+            .toList();
+        timetable = ((data['timetable'] as List?) ?? [])
+            .map((e) => TimetableEntry.fromJson(e as Map<String, dynamic>))
             .toList();
         final att = data['attendance'] as Map<String, dynamic>;
         attendance = att.map(
@@ -79,6 +89,8 @@ class EduState extends ChangeNotifier {
         'students': students.map((s) => s.toJson()).toList(),
         'fees': fees.map((f) => f.toJson()).toList(),
         'notices': notices.map((n) => n.toJson()).toList(),
+        'results': results.map((r) => r.toJson()).toList(),
+        'timetable': timetable.map((t) => t.toJson()).toList(),
         'attendance': attendance,
       };
 
@@ -141,6 +153,65 @@ class EduState extends ChangeNotifier {
     attendance[yesterday] = {
       for (final s in students) s.id: s.id != 's04' && s.id != 's10',
     };
+    // Seed Monthly Exam results: four subjects, each out of 100.
+    const seedMarks = <String, List<double>>{
+      's01': [78, 82, 88, 75],
+      's02': [85, 79, 91, 84],
+      's03': [62, 58, 71, 66],
+      's04': [45, 52, 48, 55],
+      's05': [90, 86, 93, 89],
+      's06': [74, 81, 69, 77],
+      's07': [68, 72, 80, 64],
+      's08': [88, 91, 84, 90],
+      's09': [55, 49, 61, 58],
+      's10': [92, 88, 95, 91],
+      's11': [38, 44, 41, 47],
+      's12': [79, 83, 76, 82],
+    };
+    const seedSubjects = ['Bangla', 'English', 'Mathematics', 'Science'];
+    results = [
+      for (final entry in seedMarks.entries)
+        for (var i = 0; i < seedSubjects.length; i++)
+          ExamResult(
+            id: 'r-${entry.key}-$i',
+            studentId: entry.key,
+            examName: 'Monthly Exam',
+            subject: seedSubjects[i],
+            marks: entry.value[i],
+            totalMarks: 100,
+          ),
+    ];
+    // Seed a weekly timetable: five periods, Monday to Friday.
+    const daySubjects = <List<String>>[
+      ['Bangla', 'English', 'Mathematics', 'Science', 'ICT'],
+      ['Mathematics', 'Bangla', 'English', 'Science', 'Social Science'],
+      ['English', 'Mathematics', 'Science', 'Bangla', 'ICT'],
+      ['Science', 'Mathematics', 'English', 'Bangla', 'Religion'],
+      ['Mathematics', 'Science', 'Bangla', 'English', 'Physical Education'],
+    ];
+    const subjectTeachers = <String, String>{
+      'Bangla': 'Mr. Rahman',
+      'English': 'Ms. Akter',
+      'Mathematics': 'Mr. Hossain',
+      'Science': 'Ms. Jahan',
+      'ICT': 'Mr. Karim',
+      'Social Science': 'Ms. Begum',
+      'Religion': 'Mr. Ali',
+      'Physical Education': 'Mr. Das',
+    };
+    timetable = [
+      for (final schoolClass in classes)
+        for (var day = 0; day < daySubjects.length; day++)
+          for (var period = 0; period < daySubjects[day].length; period++)
+            TimetableEntry(
+              id: 't-${schoolClass.id}-${day + 1}-${period + 1}',
+              classId: schoolClass.id,
+              weekday: day + 1,
+              period: period + 1,
+              subject: daySubjects[day][period],
+              teacher: subjectTeachers[daySubjects[day][period]] ?? '',
+            ),
+    ];
   }
 
   String classLabel(String classId) {
@@ -174,6 +245,7 @@ class EduState extends ChangeNotifier {
   Future<void> removeStudent(String id) async {
     students.removeWhere((s) => s.id == id);
     fees.removeWhere((f) => f.studentId == id);
+    results.removeWhere((r) => r.studentId == id);
     for (final day in attendance.values) {
       day.remove(id);
     }
@@ -251,19 +323,86 @@ class EduState extends ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> addResult({
+    required String studentId,
+    required String examName,
+    required String subject,
+    required double marks,
+    required double totalMarks,
+  }) async {
+    // One mark per student, exam and subject: replace an old entry.
+    results.removeWhere(
+      (r) =>
+          r.studentId == studentId &&
+          r.examName == examName &&
+          r.subject == subject,
+    );
+    results.add(ExamResult(
+      id: _newId(),
+      studentId: studentId,
+      examName: examName,
+      subject: subject,
+      marks: marks,
+      totalMarks: totalMarks,
+    ));
+    await _save();
+    notifyListeners();
+  }
+
+  Future<void> removeResult(String id) async {
+    results.removeWhere((r) => r.id == id);
+    await _save();
+    notifyListeners();
+  }
+
+  Future<void> addTimetableEntry({
+    required String classId,
+    required int weekday,
+    required int period,
+    required String subject,
+    required String teacher,
+  }) async {
+    // One lesson per class, weekday and period: replace an old entry.
+    timetable.removeWhere(
+      (t) =>
+          t.classId == classId &&
+          t.weekday == weekday &&
+          t.period == period,
+    );
+    timetable.add(TimetableEntry(
+      id: _newId(),
+      classId: classId,
+      weekday: weekday,
+      period: period,
+      subject: subject,
+      teacher: teacher,
+    ));
+    await _save();
+    notifyListeners();
+  }
+
+  Future<void> removeTimetableEntry(String id) async {
+    timetable.removeWhere((t) => t.id == id);
+    await _save();
+    notifyListeners();
+  }
+
   Future<void> removeNotice(String id) async {
     notices.removeWhere((n) => n.id == id);
     await _save();
     notifyListeners();
   }
 
-  /// Removes every class, student, fee, notice and attendance record.
-  /// Nothing is reseeded, so the app starts clean.
+  /// Removes every class, student, fee, notice, result, timetable
+  /// entry and attendance record. Nothing is reseeded, so the app
+  /// starts clean.
   Future<void> clearAll() async {
     classes = [];
     students = [];
     fees = [];
     notices = [];
+    results = [];
+    timetable = [];
     attendance = {};
     await _save();
     notifyListeners();

@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../logic/edu_logic.dart';
 import '../state/edu_state.dart';
+import 'message_dialog.dart';
 
 class AttendanceScreen extends StatefulWidget {
   const AttendanceScreen({super.key});
@@ -93,6 +94,19 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                         onSelected: (_) =>
                             state.setAttendance(date, student.id, false),
                       ),
+                      if (value == false)
+                        IconButton(
+                          icon: const Icon(Icons.message, size: 20),
+                          tooltip: 'Absence notice for guardian',
+                          onPressed: () => showCopyableMessage(
+                            context,
+                            title: 'Absence notice',
+                            text: absenceNoticeText(
+                              student: student,
+                              date: date,
+                            ),
+                          ),
+                        ),
                     ],
                   ),
                 ),

@@ -16,6 +16,10 @@ void main() {
       await state.resetDemoData();
       expect(state.classes.length, 2);
       expect(state.students.length, 12);
+      // 12 students x 4 subjects in the Monthly Exam.
+      expect(state.results.length, 48);
+      // 2 classes x 5 days x 5 periods.
+      expect(state.timetable.length, 50);
 
       await state.clearAll();
 
@@ -23,6 +27,8 @@ void main() {
       expect(state.students, isEmpty);
       expect(state.fees, isEmpty);
       expect(state.notices, isEmpty);
+      expect(state.results, isEmpty);
+      expect(state.timetable, isEmpty);
       expect(state.attendance, isEmpty);
     });
 
@@ -38,7 +44,21 @@ void main() {
       expect(state.students.length, 12);
       expect(state.fees.length, 12);
       expect(state.notices.length, 2);
+      expect(state.results.length, 48);
+      expect(state.timetable.length, 50);
       expect(state.attendance, isNotEmpty);
+    });
+
+    test('resetDemoData persists results and timetable too', () async {
+      final state = EduState();
+      await state.clearAll();
+      await state.resetDemoData();
+
+      final reloaded = EduState();
+      await reloaded.load();
+
+      expect(reloaded.results.length, 48);
+      expect(reloaded.timetable.length, 50);
     });
 
     test('clearAll persists, so a fresh load does not reseed', () async {

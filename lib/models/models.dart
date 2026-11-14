@@ -131,3 +131,83 @@ class Notice {
         'date': date,
       };
 }
+
+/// One subject mark for one student in one exam.
+/// [marks] is the score out of [totalMarks].
+class ExamResult {
+  ExamResult({
+    required this.id,
+    required this.studentId,
+    required this.examName,
+    required this.subject,
+    required this.marks,
+    required this.totalMarks,
+  });
+
+  factory ExamResult.fromJson(Map<String, dynamic> json) => ExamResult(
+        id: json['id'] as String,
+        studentId: json['studentId'] as String,
+        examName: json['examName'] as String,
+        subject: json['subject'] as String,
+        marks: (json['marks'] as num).toDouble(),
+        totalMarks: (json['totalMarks'] as num).toDouble(),
+      );
+
+  final String id;
+  final String studentId;
+  final String examName;
+  final String subject;
+  final double marks;
+  final double totalMarks;
+
+  double get percentage => totalMarks <= 0 ? 0 : marks / totalMarks * 100;
+
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'studentId': studentId,
+        'examName': examName,
+        'subject': subject,
+        'marks': marks,
+        'totalMarks': totalMarks,
+      };
+}
+
+/// One weekly timetable slot for a class.
+/// [weekday] is 1 for Monday through 5 for Friday.
+/// [period] is the period number within the day, starting at 1.
+class TimetableEntry {
+  TimetableEntry({
+    required this.id,
+    required this.classId,
+    required this.weekday,
+    required this.period,
+    required this.subject,
+    required this.teacher,
+  });
+
+  factory TimetableEntry.fromJson(Map<String, dynamic> json) =>
+      TimetableEntry(
+        id: json['id'] as String,
+        classId: json['classId'] as String,
+        weekday: json['weekday'] as int,
+        period: json['period'] as int,
+        subject: json['subject'] as String,
+        teacher: json['teacher'] as String,
+      );
+
+  final String id;
+  final String classId;
+  final int weekday;
+  final int period;
+  final String subject;
+  final String teacher;
+
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'classId': classId,
+        'weekday': weekday,
+        'period': period,
+        'subject': subject,
+        'teacher': teacher,
+      };
+}

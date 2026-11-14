@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../logic/edu_logic.dart';
 import '../state/edu_state.dart';
 import '../utils/format.dart';
+import 'message_dialog.dart';
 
 class FeesScreen extends StatelessWidget {
   const FeesScreen({super.key});
@@ -71,6 +72,22 @@ class FeesScreen extends StatelessWidget {
                               backgroundColor: Colors.green,
                             ),
                             IconButton(
+                              icon: const Icon(Icons.receipt, size: 20),
+                              tooltip: 'View fee receipt',
+                              onPressed: () => showCopyableMessage(
+                                context,
+                                title: 'Fee receipt',
+                                text: feeReceiptText(
+                                  student: student,
+                                  classLabel:
+                                      state.classLabel(student.classId),
+                                  month: month,
+                                  amount: fee.amount,
+                                  paidOn: fee.paidOn,
+                                ),
+                              ),
+                            ),
+                            IconButton(
                               icon: const Icon(Icons.undo),
                               tooltip: 'Mark unpaid',
                               onPressed: () =>
@@ -84,6 +101,19 @@ class FeesScreen extends StatelessWidget {
                             const Chip(
                               label: Text('Due'),
                               backgroundColor: Colors.red,
+                            ),
+                            IconButton(
+                              icon: const Icon(Icons.message, size: 20),
+                              tooltip: 'Fee reminder for guardian',
+                              onPressed: () => showCopyableMessage(
+                                context,
+                                title: 'Fee reminder',
+                                text: feeReminderText(
+                                  student: student,
+                                  month: month,
+                                  amount: fee.amount,
+                                ),
+                              ),
                             ),
                             TextButton(
                               onPressed: () =>
