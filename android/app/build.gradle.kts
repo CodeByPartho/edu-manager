@@ -74,7 +74,22 @@ android {
             excludes += "commonMain/**"
             excludes += "linuxMain/**"
             excludes += "nativeMain/**"
+            excludes += "nonJvmMain/**"
+            excludes += "jsMain/**"
+            excludes += "wasmJsMain/**"
+            excludes += "wasmWasiMain/**"
+            excludes += "appleMain/**"
+            excludes += "mingwMain/**"
+            excludes += "iosMain/**"
+            excludes += "macosMain/**"
+            excludes += "tvosMain/**"
+            excludes += "watchosMain/**"
+            excludes += "androidNativeMain/**"
             excludes += "META-INF/kotlin-project-structure-metadata.json"
+            excludes += "META-INF/**/LICENSE.txt"
+            excludes += "META-INF/**/LICENSE"
+            excludes += "META-INF/**/NOTICE.txt"
+            excludes += "META-INF/**/NOTICE"
         }
     }
 }
